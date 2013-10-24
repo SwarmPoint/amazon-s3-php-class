@@ -1280,7 +1280,7 @@ class S3
 	* @param array $trustedSigners Array of trusted signers
 	* @return array | false
 	*/
-	public static function createDistribution($bucket, $enabled = true, $cnames = array(), $comment = null, $defaultRootObject = null, $originAccessIdentity = null, $trustedSigners = array())
+	public static function createDistribution($bucket, $enabled = true, $cnames = array(), $comment = null, $defaultRootObject = null, $callerReference = null, $originAccessIdentity = null, $trustedSigners = array())
 	{
 		if (!extension_loaded('openssl'))
 		{
@@ -1292,11 +1292,14 @@ class S3
 
 		self::$useSSL = true; // CloudFront requires SSL
 		$rest = new S3Request('POST', '', '2010-11-01/distribution', 'cloudfront.amazonaws.com');
+        if ( !isset( $callerReference ) ) {
+            $callerReference = (string)microtime(true);
+        }
 		$rest->data = self::__getCloudFrontDistributionConfigXML(
 			$bucket.'.s3.amazonaws.com',
 			$enabled,
 			(string)$comment,
-			(string)microtime(true),
+			$callerReference,
 			$cnames,
 			$defaultRootObject,
 			$originAccessIdentity,
@@ -1684,9 +1687,22 @@ class S3
 		$distributionConfig->appendChild($dom->createElement('Enabled', $enabled ? 'true' : 'false'));
 
 		$trusted = $dom->createElement('TrustedSigners');
+/*
+    FIX1
+    Creates the XML
+    TrustedSigners were not actually in 2010-11-01
+    An item under Default and other CacheBehaviour in 2012-05-05 to current 2013-09-27
+    TrustedSigners must contain the following tags prior to the <Items> <AwsAccountNumber>
+                  <Enabled>true | false</Enabled>
+                  <Quantity>number of trusted signers</Quantity>
+    https://github.com/tpyo/amazon-s3-php-class/issues/9
+*/
+		$count = count( $trustedSigners );
+		$trusted->appendChild($dom->createElement('Enabled', $count > 0 ? 'true' : 'false'));
+		$trusted->appendChild($dom->createElement('Quantity', $count));
 		foreach ($trustedSigners as $id => $type)
 			$trusted->appendChild($id !== '' ? $dom->createElement($type, $id) : $dom->createElement($type));
-		$distributionConfig->appendChild($trusted);
+		//$distributionConfig->appendChild($trusted);
 
 		$dom->appendChild($distributionConfig);
 		//var_dump($dom->saveXML());
@@ -1741,6 +1757,17 @@ class S3
 
 		$dist['trustedSigners'] = array();
 		if (isset($node->TrustedSigners))
+/*
+    FIX1
+    Parses the XML
+    TrustedSigners were not actually in 2010-11-01
+    An item under Default and other CacheBehaviour in 2012-05-05 to current 2013-09-27
+                  <Enabled>true | false</Enabled>
+                  <Quantity>number of trusted signers</Quantity>
+    I think this is not falling over because 2010-11-01 probably isn't responding with the structure
+    so the code isn't hitting a TurstedSigners which contains Enabled and Quantity
+    https://github.com/tpyo/amazon-s3-php-class/issues/9
+*/
 			foreach ($node->TrustedSigners as $signer)
 			{
 				if (isset($signer->Self))
