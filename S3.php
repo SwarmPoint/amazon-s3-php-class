@@ -1731,7 +1731,12 @@ class S3
 			$dist['status'] = (string)$node->Status;
 			$dist['time'] = strtotime((string)$node->LastModifiedTime);
 			$dist['domain'] = (string)$node->DomainName;
-		}
+		} else {
+            // FIX1 This appears to not be populated immediately after creation which is a problem as we need the id.
+            echo '<br/><pre>', PHP_EOL;
+		    var_dump( $node->saveXML() );
+            echo '</pre><br/>', PHP_EOL;
+        }
 
 		if (isset($node->CallerReference))
 			$dist['callerReference'] = (string)$node->CallerReference;
