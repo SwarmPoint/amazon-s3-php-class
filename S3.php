@@ -1754,7 +1754,12 @@ class S3
         }
 
 		if (isset($node->CallerReference)) {
+            echo '<p>Found callerReference</p>', PHP_EOL;
+            echo '<br/><pre>', PHP_EOL;
+		    var_dump( $node );
+            echo '</pre><br/>', PHP_EOL;
 			$dist['callerReference'] = (string)$node->CallerReference;
+            echo '<p>Stored ', var_dump( $node->CallerReference ) ,' as ', $dist['callerReference'], '.</p>', PHP_EOL;
         } else {
             echo '<p>callerReference not found</p>', PHP_EOL;
             echo '<br/><pre>', PHP_EOL;
