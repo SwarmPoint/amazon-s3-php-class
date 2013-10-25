@@ -1721,8 +1721,15 @@ class S3
 	*/
 	private static function __parseCloudFrontDistributionConfig(&$node)
 	{
-		if (isset($node->DistributionConfig))
+		if (isset($node->DistributionConfig)) {
+            echo '<p>Calling recursively with DistributionConfig</p>', PHP_EOL;
+            echo '<br/><pre>', PHP_EOL;
+		    var_dump( $node->saveXML() );
+		    var_dump( $node );
+            echo '</pre><br/>', PHP_EOL;
+            echo '<p>Calling...</p>', PHP_EOL;
 			return self::__parseCloudFrontDistributionConfig($node->DistributionConfig);
+        }
 
 		$dist = array();
 		if (isset($node->Id, $node->Status, $node->LastModifiedTime, $node->DomainName))
@@ -1735,6 +1742,7 @@ class S3
             // FIX1 This appears to not be populated immediately after creation which is a problem as we need the id.
             echo '<br/><pre>', PHP_EOL;
 		    var_dump( $node->saveXML() );
+		    var_dump( $node );
             echo '</pre><br/>', PHP_EOL;
         }
 
