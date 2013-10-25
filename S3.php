@@ -1705,7 +1705,12 @@ class S3
 		//$distributionConfig->appendChild($trusted);
 
 		$dom->appendChild($distributionConfig);
-		//var_dump($dom->saveXML());
+        // FIX1
+        echo '<br/><h1>__getCloudFrontDistributionConfigXML building the XML</h1>', PHP_EOL;
+        echo '<br/><pre>', PHP_EOL;
+		var_dump($dom->saveXML());
+		var_dump( $dom );
+        echo '</pre><br/>', PHP_EOL;
 		return $dom->saveXML();
 	}
 
