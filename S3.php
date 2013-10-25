@@ -1280,7 +1280,7 @@ class S3
 	* @param array $trustedSigners Array of trusted signers
 	* @return array | false
 	*/
-	public static function createDistribution($bucket, $enabled = true, $cnames = array(), $comment = null, $defaultRootObject = null, $callerReference = null, $originAccessIdentity = null, $trustedSigners = array())
+	public static function createDistribution($bucket, $enabled = true, $cnames = array(), $comment = null, $defaultRootObject = null, $originAccessIdentity = null, $callerReference = null, $trustedSigners = array())
 	{
 		if (!extension_loaded('openssl'))
 		{
