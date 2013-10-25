@@ -1719,19 +1719,11 @@ class S3
 	* @param object &$node DOMNode
 	* @return array
 	*/
-	private static function __parseCloudFrontDistributionConfig(&$node)
+	private static function __parseCloudFrontDistributionConfig(&$node, $dist = NULL )
 	{
-		if (isset($node->DistributionConfig)) {
-            echo '<p>Calling recursively with DistributionConfig</p>', PHP_EOL;
-            echo '<br/><pre>', PHP_EOL;
-		    var_dump( $node->saveXML() );
-		    var_dump( $node );
-            echo '</pre><br/>', PHP_EOL;
-            echo '<p>Calling...</p>', PHP_EOL;
-			return self::__parseCloudFrontDistributionConfig($node->DistributionConfig);
-        }
+        if ( !isset( $dist ) )
+		    $dist = array();
 
-		$dist = array();
 		if (isset($node->Id, $node->Status, $node->LastModifiedTime, $node->DomainName))
 		{
 			$dist['id'] = (string)$node->Id;
@@ -1744,6 +1736,16 @@ class S3
 		    var_dump( $node->saveXML() );
 		    var_dump( $node );
             echo '</pre><br/>', PHP_EOL;
+        }
+
+		if (isset($node->DistributionConfig)) {
+            echo '<p>Calling recursively with DistributionConfig</p>', PHP_EOL;
+            echo '<br/><pre>', PHP_EOL;
+		    var_dump( $node->saveXML() );
+		    var_dump( $node );
+            echo '</pre><br/>', PHP_EOL;
+            echo '<p>Calling...</p>', PHP_EOL;
+			return self::__parseCloudFrontDistributionConfig($node->DistributionConfig, $dist);
         }
 
 		if (isset($node->CallerReference))
