@@ -1748,8 +1748,16 @@ class S3
 			return self::__parseCloudFrontDistributionConfig($node->DistributionConfig, $dist);
         }
 
-		if (isset($node->CallerReference))
+		if (isset($node->CallerReference)) {
 			$dist['callerReference'] = (string)$node->CallerReference;
+        } else {
+            echo '<p>callerReference not found</p>', PHP_EOL;
+            echo '<br/><pre>', PHP_EOL;
+		    var_dump( $node->saveXML() );
+		    var_dump( $node );
+            echo '</pre><br/>', PHP_EOL;
+            echo '<p>Oh well.</p>', PHP_EOL;
+        }
 
 		if (isset($node->Enabled))
 			$dist['enabled'] = (string)$node->Enabled == 'true' ? true : false;
