@@ -1706,7 +1706,7 @@ class S3
 
 		$dom->appendChild($distributionConfig);
         // FIX1
-        echo '<br/><h1>__getCloudFrontDistributionConfigXML building the XML</h1>', PHP_EOL;
+        echo '<br/><h2>__getCloudFrontDistributionConfigXML building the XML</h2>', PHP_EOL;
         echo '<br/><pre>', PHP_EOL;
 		var_dump($dom->saveXML());
 		var_dump( $dom );
@@ -1741,6 +1741,22 @@ class S3
 		    var_dump( $node->saveXML() );
 		    var_dump( $node );
             echo '</pre><br/>', PHP_EOL;
+        }
+
+		if (isset($node->CallerReference)) {
+            echo '<p>Found callerReference</p>', PHP_EOL;
+            echo '<br/><pre>', PHP_EOL;
+		    var_dump( $node );
+            echo '</pre><br/>', PHP_EOL;
+			$dist['callerReference'] = (string)$node->CallerReference;
+            echo '<p>Stored ', var_dump( $node->CallerReference ) ,' as ', $dist['callerReference'], '.</p>', PHP_EOL;
+        } else {
+            echo '<p>callerReference not found</p>', PHP_EOL;
+            echo '<br/><pre>', PHP_EOL;
+		    var_dump( $node->saveXML() );
+		    var_dump( $node );
+            echo '</pre><br/>', PHP_EOL;
+            echo '<p>Oh well.</p>', PHP_EOL;
         }
 
 		if (isset($node->DistributionConfig)) {
