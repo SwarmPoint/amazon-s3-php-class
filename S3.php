@@ -1705,12 +1705,6 @@ class S3
 		//$distributionConfig->appendChild($trusted);
 
 		$dom->appendChild($distributionConfig);
-        // FIX1
-        echo '<br/><h2>__getCloudFrontDistributionConfigXML building the XML</h2>', PHP_EOL;
-        echo '<br/><pre>', PHP_EOL;
-		var_dump($dom->saveXML());
-		var_dump( $dom );
-        echo '</pre><br/>', PHP_EOL;
 		return $dom->saveXML();
 	}
 
@@ -1726,8 +1720,8 @@ class S3
 	*/
 	private static function __parseCloudFrontDistributionConfig(&$node, $dist = NULL )
 	{
-        if ( !isset( $dist ) )
-		    $dist = array();
+		if ( !isset( $dist ) )
+			$dist = array();
 
 		if (isset($node->Id, $node->Status, $node->LastModifiedTime, $node->DomainName))
 		{
@@ -1735,55 +1729,19 @@ class S3
 			$dist['status'] = (string)$node->Status;
 			$dist['time'] = strtotime((string)$node->LastModifiedTime);
 			$dist['domain'] = (string)$node->DomainName;
-		} else {
-            // FIX1 This appears to not be populated immediately after creation which is a problem as we need the id.
-            echo '<br/><pre>', PHP_EOL;
-		    var_dump( $node->saveXML() );
-		    var_dump( $node );
-            echo '</pre><br/>', PHP_EOL;
-        }
+		}
 
 		if (isset($node->CallerReference)) {
-            echo '<p>Found callerReference</p>', PHP_EOL;
-            echo '<br/><pre>', PHP_EOL;
-		    var_dump( $node );
-            echo '</pre><br/>', PHP_EOL;
 			$dist['callerReference'] = (string)$node->CallerReference;
-            echo '<p>Stored ', var_dump( $node->CallerReference ) ,' as ', $dist['callerReference'], '.</p>', PHP_EOL;
-        } else {
-            echo '<p>callerReference not found</p>', PHP_EOL;
-            echo '<br/><pre>', PHP_EOL;
-		    var_dump( $node->saveXML() );
-		    var_dump( $node );
-            echo '</pre><br/>', PHP_EOL;
-            echo '<p>Oh well.</p>', PHP_EOL;
-        }
+		}
 
 		if (isset($node->DistributionConfig)) {
-            echo '<p>Calling recursively with DistributionConfig</p>', PHP_EOL;
-            echo '<br/><pre>', PHP_EOL;
-		    var_dump( $node->saveXML() );
-		    var_dump( $node );
-            echo '</pre><br/>', PHP_EOL;
-            echo '<p>Calling...</p>', PHP_EOL;
 			return self::__parseCloudFrontDistributionConfig($node->DistributionConfig, $dist);
-        }
+		}
 
 		if (isset($node->CallerReference)) {
-            echo '<p>Found callerReference</p>', PHP_EOL;
-            echo '<br/><pre>', PHP_EOL;
-		    var_dump( $node );
-            echo '</pre><br/>', PHP_EOL;
 			$dist['callerReference'] = (string)$node->CallerReference;
-            echo '<p>Stored ', var_dump( $node->CallerReference ) ,' as ', $dist['callerReference'], '.</p>', PHP_EOL;
-        } else {
-            echo '<p>callerReference not found</p>', PHP_EOL;
-            echo '<br/><pre>', PHP_EOL;
-		    var_dump( $node->saveXML() );
-		    var_dump( $node );
-            echo '</pre><br/>', PHP_EOL;
-            echo '<p>Oh well.</p>', PHP_EOL;
-        }
+		}
 
 		if (isset($node->Enabled))
 			$dist['enabled'] = (string)$node->Enabled == 'true' ? true : false;
@@ -1806,17 +1764,6 @@ class S3
 
 		$dist['trustedSigners'] = array();
 		if (isset($node->TrustedSigners))
-/*
-    FIX1
-    Parses the XML
-    TrustedSigners were not actually in 2010-11-01
-    An item under Default and other CacheBehaviour in 2012-05-05 to current 2013-09-27
-                  <Enabled>true | false</Enabled>
-                  <Quantity>number of trusted signers</Quantity>
-    I think this is not falling over because 2010-11-01 probably isn't responding with the structure
-    so the code isn't hitting a TurstedSigners which contains Enabled and Quantity
-    https://github.com/tpyo/amazon-s3-php-class/issues/9
-*/
 			foreach ($node->TrustedSigners as $signer)
 			{
 				if (isset($signer->Self))
